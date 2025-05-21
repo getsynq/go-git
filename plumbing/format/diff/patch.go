@@ -1,6 +1,8 @@
 package diff
 
 import (
+	"io"
+
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/filemode"
 )
@@ -24,6 +26,8 @@ type Patch interface {
 	// Message returns an optional message that can be at the top of the
 	// Patch representation.
 	Message() string
+
+	Encode(w io.Writer) error
 }
 
 // FilePatch represents the necessary steps to transform one file into another.
@@ -37,6 +41,8 @@ type FilePatch interface {
 	// Chunks returns a slice of ordered changes to transform "from" File into
 	// "to" File. If the file is a binary one, Chunks will be empty.
 	Chunks() []Chunk
+
+	Encode(w io.Writer) error
 }
 
 // File contains all the file metadata necessary to print some patch formats.

@@ -86,15 +86,30 @@ func (e *UnifiedEncoder) Encode(patch Patch) error {
 	}
 
 	for _, filePatch := range patch.FilePatches() {
-		e.writeFilePatchHeader(sb, filePatch)
-		g := newHunksGenerator(filePatch.Chunks(), e.contextLines)
-		for _, hunk := range g.Generate() {
-			hunk.writeTo(sb, e.color)
-		}
+		e.encodeFilePatch(sb, filePatch)
 	}
 
 	_, err := e.Write([]byte(sb.String()))
 	return err
+}
+
+func (e *UnifiedEncoder) EncodeFilePatch(filePatch FilePatch) error {
+	sb := &strings.Builder{}
+	e.writeFilePatchHeader(sb, filePatch)
+	g := newHunksGenerator(filePatch.Chunks(), e.contextLines)
+	for _, hunk := range g.Generate() {
+		hunk.writeTo(sb, e.color)
+	}
+	_, err := e.Write([]byte(sb.String()))
+	return err
+}
+
+func (e *UnifiedEncoder) encodeFilePatch(sb *strings.Builder, filePatch FilePatch) {
+	e.writeFilePatchHeader(sb, filePatch)
+	g := newHunksGenerator(filePatch.Chunks(), e.contextLines)
+	for _, hunk := range g.Generate() {
+		hunk.writeTo(sb, e.color)
+	}
 }
 
 func (e *UnifiedEncoder) writeFilePatchHeader(sb *strings.Builder, filePatch FilePatch) {

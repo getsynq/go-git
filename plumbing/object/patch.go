@@ -202,6 +202,21 @@ func (tf *textFilePatch) Chunks() []fdiff.Chunk {
 	return tf.chunks
 }
 
+func (tf *textFilePatch) String() string {
+	buf := bytes.NewBuffer(nil)
+	err := tf.Encode(buf)
+	if err != nil {
+		return fmt.Sprintf("malformed patch: %s", err.Error())
+	}
+	return buf.String()
+}
+
+func (tf *textFilePatch) Encode(w io.Writer) error {
+	ue := fdiff.NewUnifiedEncoder(w, fdiff.DefaultContextLines)
+
+	return ue.EncodeFilePatch(tf)
+}
+
 // textChunk is an implementation of fdiff.Chunk interface
 type textChunk struct {
 	content string
